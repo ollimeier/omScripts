@@ -1,9 +1,9 @@
-#MenuTitle: Cut and shift
+#MenuTitle: Cut and Shift
 # -*- coding: utf-8 -*-
-# Code by Olli Meier
+# Code by Olli Meier (Github: moontypespace, Instagram: tyyyyypo)
 
 __doc__="""
-Cut every glyph and shift it.
+Cut a glyph and shift the top part to the right for just a selection of glyphs or for all glyphs in a font.
 """
 
 import GlyphsApp
