@@ -36,7 +36,7 @@ class WindowComb(object):
 		a = 400
 		b = a/2 - 40
 		
-		self.w = Window((a, b), "Change naming of anchors")
+		self.w = Window((a, b), "Rename Anchors")
 
 		self.w.w_width = TextBox((10, 13, -10, 17), "Old name of anchor: ")
 		self.w.textEditor_old = EditText((a*2/4, 10, -10, 22))
