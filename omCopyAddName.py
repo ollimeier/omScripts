@@ -1,6 +1,6 @@
 #MenuTitle: copy glyph and add ending to name
 # -*- coding: utf-8 -*-
-# Code by Olli Meier, January 2016, Version 1.00
+# Code by Olli Meier, January 2016, Version 1.01
 __doc__="""
 Copy glyph from selection and add somthing to the name.
 """
@@ -31,9 +31,9 @@ def copyGlyph_addName(font, glyph,x):
 	if not skip:
 		newGlyph = font.glyphs[oldName].copy()
 		newGlyph.name = newName
-	
-		font.glyphs.append(newGlyph)
+		newGlyph.unicode = '' #It makes no sense to copy the unicode. For the future it would be nice to check the GlyphData.xml if there is a unicode for the new name. 
 		
+		font.glyphs.append(newGlyph)
 
 
 class WindowComb(object):
