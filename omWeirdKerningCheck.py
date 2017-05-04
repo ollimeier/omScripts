@@ -24,7 +24,7 @@ def weirdKerningCheck(font=None):
 					kernValues.append(singleKern[kernValue])
 
 	
-	return kernGroup, everyKern, kernValues
+	return kernGroup, totalKern, kernValues
 
 def getGlyphWidth(font=None):
 	glyphWidth = {}
@@ -38,9 +38,9 @@ def getGlyphWidth(font=None):
 
 if __name__ == "__main__":
 	
-	kernGroup, everyKern, kernValues = weirdKerningCheck(font)
+	kernGroup, totalKern, kernValues = weirdKerningCheck(font)
 	glyphWidth = getGlyphWidth(font)
-	content = 'Kerning groups: ' + str(kernGroup) + '\n' + 'Number of kerning pairs: ' + str(everyKern) + '\n' + 'Min kerning: ' + str(min(kernValues))
+	content = ('Kerning groups: ' + str(kernGroup) + '\n' + 'Number of kerning pairs: ' + str(totalKern) + '\n' + 'Min kerning: ' + str(min(kernValues)) + '\n' + 'Max kerning: ' + str(max(kernValues)))
 	
 	generalGlyphwidth = []
 	for anyG in glyphWidth:
