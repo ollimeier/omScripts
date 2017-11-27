@@ -1,8 +1,8 @@
-#MenuTitle: delete anchors
+#MenuTitle: Delete Anchors from Selection
 # -*- coding: utf-8 -*-
 # Code by Olli Meier, January 2016
 __doc__="""
-delete all anchors in all masters of your selection.
+Delete all anchors in all masters of your selection.
 """
 
 from GlyphsApp import *

@@ -1,4 +1,4 @@
-#MenuTitle: check weird kerning
+#MenuTitle: Check Weird Kerning
 # -*- coding: utf-8 -*-
 # Code by Olli Meier, Mai 2016
 __doc__="""

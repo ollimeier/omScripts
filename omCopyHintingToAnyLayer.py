@@ -1,4 +1,4 @@
-#MenuTitle: copy hinting from one layer to another
+#MenuTitle: Copy Hinting from one Layer to Another
 # -*- coding: utf-8 -*-
 # Code by Olli Meier, July 2017
 # Version 1.0

@@ -1,6 +1,6 @@
-#MenuTitle: copy glyph and add ending to name
+#MenuTitle: Copy Glyph and add Ending to Name
 # -*- coding: utf-8 -*-
-# Code by Olli Meier, January 2016, Version 1.01
+# Code by Olli Meier, Oktober 2017, Version 1.02
 __doc__="""
 Copy glyph from selection and add somthing to the name.
 """
@@ -16,31 +16,33 @@ except:
 font = Glyphs.font
 
 warnings = []
-
+added = []
 def copyGlyph_addName(font, glyph,x):
 	oldName = glyph.name
 	newName = glyph.name + x
 	
 	skip = False
-	
-	for g in font.glyphs:
-		if newName == g.name:
-			warnings.append(newName)
-			skip = True
+	if font.glyphs[newName]:
+		warnings.append(newName)
+		skip = True
 	
 	if not skip:
 		newGlyph = font.glyphs[oldName].copy()
 		newGlyph.name = newName
 		newGlyph.unicode = '' #It makes no sense to copy the unicode. For the future it would be nice to check the GlyphData.xml if there is a unicode for the new name. 
-		
+		added.append(newName)
 		font.glyphs.append(newGlyph)
+
+def updateGlyphInfo(added):
+	for name in added:
+		font.glyphs[name].updateGlyphInfo()
 
 
 class WindowComb(object):
 	
 	def __init__(self):
 		a = 400
-		b = a/2 - 40
+		b = a/3 - 50
 		
 		self.w = Window((a, b), "Copy and add ending to name")
 
@@ -48,7 +50,7 @@ class WindowComb(object):
 		self.w.textEditor_1 = EditText((a*2/4, 10, -10, 22))
 		self.w.textEditor_1.set('.case')
 		
-		self.w.Button = Button((10, 110, -10, -10), "process", callback = self.Button)
+		self.w.Button = Button((10, b - 40 , -10, -10), "process", callback = self.Button)
 
 		self.w.open()
 
@@ -63,6 +65,8 @@ class WindowComb(object):
 		if x: 
 			for glyph in font.selection:
 				copyGlyph_addName(font, glyph, x)
+			if added:
+				updateGlyphInfo(added)
 			print "Done."
 			self.w.close()
 

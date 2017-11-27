@@ -1,4 +1,4 @@
-#MenuTitle: rename anchors
+#MenuTitle: Rename Anchors from Selection
 # -*- coding: utf-8 -*-
 # Code by Olli Meier, January 2016, Version 1.00
 __doc__="""
@@ -34,7 +34,7 @@ class WindowComb(object):
 	
 	def __init__(self):
 		a = 400
-		b = a/2 - 40
+		b = a/2 - 100
 		
 		self.w = Window((a, b), "Rename Anchors")
 
@@ -46,7 +46,7 @@ class WindowComb(object):
 		self.w.textEditor_new = EditText((a*2/4, 40, -10, 22))
 		self.w.textEditor_new.set('topCase')
 		
-		self.w.Button = Button((10, 110, -10, -10), "process", callback = self.Button)
+		self.w.Button = Button((10, b - 30, -10, -10), "process", callback = self.Button)
 
 		self.w.open()
 
