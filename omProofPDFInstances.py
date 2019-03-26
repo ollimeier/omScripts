@@ -1,6 +1,6 @@
 #MenuTitle: Proof PDF Instances
 # -*- coding: utf-8 -*-
-# Code by Olli Meier, October 2017, Version 1.00
+# Code by Olli Meier, May 2018, Version 1.01
 
 __doc__="""
 It generates a PDF and saves it to your desktop.
@@ -19,7 +19,7 @@ from GlyphsApp import *
 
 import drawBot as d
 
-font = Glyphs.font
+fonts = Glyphs.fonts
 
 rows = 10
 distance = 10
@@ -33,17 +33,6 @@ topMargin = 30
 bottomMargin = topMargin
 
 
-interpolations = []
-
-
-for i in font.instances:
-    if i.active == True:
-		interpolations.append(i.interpolatedFont)
-
-#print interpolations
-
-d.newDrawing()
-
 def getMaxUPM(font):
     collectAscender = []
     collectDescender = []
@@ -53,7 +42,7 @@ def getMaxUPM(font):
     maxHeight = max(collectAscender) - min(collectDescender)
     return maxHeight
 
-def getMaxWidth():
+def getMaxWidth(interpolations):
     collectWidth = []
     for value, instance in enumerate(interpolations):
         for glyph in instance.glyphs:
@@ -61,7 +50,7 @@ def getMaxWidth():
     return max(collectWidth)
 
 
-def scale(rows, pageX, pageY, distance, leftMargin, rightMargin, topMargin, bottomMargin):
+def scale(rows, pageX, pageY, distance, leftMargin, rightMargin, topMargin, bottomMargin, interpolations):
     height =  (pageY - ((rows+1)* distance)) / (rows + 1) # plus one to have more distance to the buttom
     #height = (((rows+1)* distance) + pageY) / rows
     PageLayoutWidth = pageX - leftMargin - rightMargin
@@ -71,7 +60,7 @@ def scale(rows, pageX, pageY, distance, leftMargin, rightMargin, topMargin, bott
     scale = height / maxGlyphHeight
     scaleUndo = getMaxUPM(font) / height
     
-    maxGlyphWidth = getMaxWidth()
+    maxGlyphWidth = getMaxWidth(interpolations)
     if (len(interpolations) * maxGlyphWidth * scale) > PageLayoutWidth:
         scale = PageLayoutWidth / ((len(interpolations) * maxGlyphWidth))
         scaleUndo = (len(interpolations) * maxGlyphWidth) / PageLayoutWidth
@@ -87,9 +76,9 @@ def scale(rows, pageX, pageY, distance, leftMargin, rightMargin, topMargin, bott
     return scale, scaleUndo, newRows
 
 
-def main(rows):
+def main(rows, interpolations, x):
     #d.font("any FontName")    
-    scaleFactor, scaleFactorUndo, newRows = scale(rows, pageX, pageY, distance, leftMargin, rightMargin, topMargin, bottomMargin)
+    scaleFactor, scaleFactorUndo, newRows = scale(rows, pageX, pageY, distance, leftMargin, rightMargin, topMargin, bottomMargin, interpolations)
     #scaleFactor = 0.02
     
     if rows < newRows:
@@ -98,60 +87,77 @@ def main(rows):
     print (rows)
 
     height = getMaxUPM(font) * scaleFactor
-    d.newpage (pageX, pageY) # first page
+    d.newPage (pageX, pageY) # first page
     headerStr = '%s by %s' %(font.familyName, font.designer)
     d.fontSize(6)
     d.textBox(headerStr , (margin, pageY - topMargin, pageX - margin * 2, margin), align="center") #Date + name
     moveByRow = []
     d.translate(leftMargin, pageY - topMargin)
 
-    for i, glyph in enumerate(font.glyphs):
-        i = i +1
-        if (i % rows == 0):
-            d.newpage (pageX, pageY)
+    for j, glyph in enumerate(font.glyphs):
+        if glyph.export == True:
+            i = j +1
+            if (i % rows == 0):
+                d.newPage (pageX, pageY)
+                d.fontSize(6)
+                d.textBox(headerStr, (margin, pageY - topMargin, pageX - margin * 2, margin), align="center") #Date + name
+                d.textBox(str(d.pageCount()) , (margin, 0, pageX - margin * 2, margin), align="center") #page number + CopyRight
+                d.fontSize(3)
+                d.textBox( 'Script by Olli Meier' , (margin, 0, pageX - margin * 2, margin/2), align="center") #page number + CopyRight
+                d.translate(leftMargin, pageY - topMargin)
+                #d.translate(0, -(sum(moveByRow) + distance))
+                moveByRow = []
+                #
+                
+            moveByRow.append(height + distance)
+
             d.fontSize(6)
-            d.textBox(headerStr, (margin, pageY - topMargin, pageX - margin * 2, margin), align="center") #Date + name
-            d.textBox(str(d.pageCount()) , (margin, 0, pageX - margin * 2, margin), align="center") #page number + CopyRight
-            d.fontSize(3)
-            d.textBox( 'Script by Olli Meier' , (margin, 0, pageX - margin * 2, margin/2), align="center") #page number + CopyRight
-            d.translate(leftMargin, pageY - topMargin)
-            #d.translate(0, -(sum(moveByRow) + distance))
-            moveByRow = []
-            #
+            d.translate(0, -(height + distance))
+            getBaseline = d.textBoxBaselines('%s\n%s' %(glyph.name, glyph.unicode) , (-leftMargin + margin, 0, leftMargin - margin*1.5, height))
+            moveToBaseline = getBaseline[0][1]
+            d.textBox('%s\n%s' %(glyph.name, glyph.unicode) , (-leftMargin + margin , 0 - moveToBaseline, leftMargin - margin*1.5, height ), align="right") #page number + CopyRight
+            #d.translate(0, -(50))
+            gWidthsInst = []
+            for value, instance in enumerate(interpolations):
+                d.save()
+                d.scale(scaleFactor)
+        
+                width_total_temp = sum(gWidthsInst)
+                d.translate ( width_total_temp, 0)
+        
+                g = instance.glyphs[glyph.name]
+
+                
+                try:
+                    gwidth = (g.layers[0].width)
+                    gWidthsInst.append(gwidth)
             
-        moveByRow.append(height + distance)
+                    n = g.layers[0].bezierPath
+                    d.drawPath(n)
+                    layer = g.layers[0]
+                    for component in layer.components:
+                        Cmp = component.bezierPath
+                        d.drawPath(Cmp)
+                except:
+                    print ('Could not draw: ', glyph.name)
 
-        d.fontSize(6)
-        d.translate(0, -(height + distance))
-        getBaseline = d.textBoxBaselines('%s\n%s' %(glyph.name, glyph.unicode) , (-leftMargin + margin, 0, leftMargin - margin*1.5, height))
-        moveToBaseline = getBaseline[0][1]
-        d.textBox('%s\n%s' %(glyph.name, glyph.unicode) , (-leftMargin + margin , 0 - moveToBaseline, leftMargin - margin*1.5, height ), align="right") #page number + CopyRight
-        #d.translate(0, -(50))
-        gWidthsInst = []
-        for value, instance in enumerate(interpolations):
-            d.save()
-            d.scale(scaleFactor)
-    
-            width_total_temp = sum(gWidthsInst)
-            d.translate ( width_total_temp, 0)
-    
-            g = instance.glyphs[glyph.name]
+                d.stroke(0.7)
+                d.line((0, 0), (layer.width, 0)) #underline
+                d.restore()
 
-            gwidth = (g.layers[0].width)
-            gWidthsInst.append(gwidth)
-    
-            n = g.layers[0].bezierPath
-            d.drawPath(n)
-            layer = g.layers[0]
-            for component in layer.components:
-                Cmp = component.bezierPath
-                d.drawPath(Cmp)
-            d.stroke(0.7)
-            d.line((0, 0), (layer.width, 0)) #underline
-            d.restore()
-
-    path = savePath + '/%s%s%s_%s%s_%s_proof.pdf' %(now.year, now.month, now.day, now.hour, now.minute, font.familyName)
+    path = savePath + '/%s%s%s_%s%s_%s_%s_proof.pdf' %(now.year, now.month, now.day, now.hour, now.minute, font.familyName, x)
     d.saveImage([path])
 
 
-main(rows) 
+for x, font in enumerate(fonts):
+    interpolations = []
+
+    for i in font.instances:
+        if i.active == True:
+            interpolations.append(i.interpolatedFont)
+
+    #print interpolations
+
+    d.newDrawing()
+
+    main(rows, interpolations, x) 

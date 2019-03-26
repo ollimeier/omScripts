@@ -24,6 +24,9 @@ def cut(font, glyph, x, y, z):
 	for master in font.masters:
 		mID = master.id
 		masterlayer = font.glyphs[g.name].layers[mID]
+
+		#for component in masterlayer.components:
+		#	print ('component: ', component)
 		
 		masterlayer.removeOverlap() # remove overlaping
 		masterlayer.cutBetweenPoints(NSPoint(y, x), NSPoint(masterlayer.width, x )) #cut paths
