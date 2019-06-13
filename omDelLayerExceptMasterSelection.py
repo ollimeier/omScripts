@@ -19,7 +19,7 @@ def delLayers(g):
 	for x, layer in enumerate(g.layers):
 		#if layer.name not in masterName:
 
-		if not (layer.isMasterLayer() or layer.isBraceLayer() or layer.isSpecialLayer):
+		if not (layer.isMasterLayer() or layer.isBraceLayer() or layer.isSpecialLayer()):
 			delList.append(x)
 		'''
 		 	print ('layer Master: ', layer.name)
