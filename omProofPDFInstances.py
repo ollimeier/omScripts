@@ -1,6 +1,9 @@
 #MenuTitle: Proof PDF Instances
 # -*- coding: utf-8 -*-
-# Code by Olli Meier, May 2018, Version 1.01
+# Code by Olli Meier, May 2022, Version 1.02
+# Quick and dirty fix for:
+# moveToBaseline = getBaseline[0][1]
+# IndexError: list index out of range
 
 __doc__="""
 It generates a PDF and saves it to your desktop.
@@ -96,6 +99,7 @@ def main(rows, interpolations, x):
 
     for j, glyph in enumerate(font.glyphs):
         if glyph.export == True:
+            print ('Start draw: ', glyph.name)
             i = j +1
             if (i % rows == 0):
                 d.newPage (pageX, pageY)
@@ -108,30 +112,33 @@ def main(rows, interpolations, x):
                 #d.translate(0, -(sum(moveByRow) + distance))
                 moveByRow = []
                 #
-                
+
             moveByRow.append(height + distance)
 
             d.fontSize(6)
             d.translate(0, -(height + distance))
             getBaseline = d.textBoxBaselines('%s\n%s' %(glyph.name, glyph.unicode) , (-leftMargin + margin, 0, leftMargin - margin*1.5, height))
-            moveToBaseline = getBaseline[0][1]
+            try:
+                moveToBaseline = getBaseline[0][1]
+            except Exception:
+                moveToBaseline = 0
             d.textBox('%s\n%s' %(glyph.name, glyph.unicode) , (-leftMargin + margin , 0 - moveToBaseline, leftMargin - margin*1.5, height ), align="right") #page number + CopyRight
             #d.translate(0, -(50))
             gWidthsInst = []
             for value, instance in enumerate(interpolations):
                 d.save()
                 d.scale(scaleFactor)
-        
+
                 width_total_temp = sum(gWidthsInst)
                 d.translate ( width_total_temp, 0)
-        
+
                 g = instance.glyphs[glyph.name]
 
-                
+
                 try:
                     gwidth = (g.layers[0].width)
                     gWidthsInst.append(gwidth)
-            
+
                     n = g.layers[0].bezierPath
                     d.drawPath(n)
                     layer = g.layers[0]
