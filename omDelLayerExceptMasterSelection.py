@@ -1,10 +1,10 @@
 #MenuTitle: Delete layers from Selection
 # encoding: utf-8
 # code by Olli Meier
-# 2017 July 15, Version 1.0
+# 2017-2022, Version 1.1
 
 __doc__="""
-Deletes all layers except masters for all selected glyphs.
+Deletes all layers except masters and special layers for all selected glyphs.
 """
 
 from GlyphsApp import *
@@ -19,18 +19,8 @@ def delLayers(g):
 	for x, layer in enumerate(g.layers):
 		#if layer.name not in masterName:
 
-		if not (layer.isMasterLayer() or layer.isBraceLayer() or layer.isSpecialLayer()):
+		if not (layer.isMasterLayer or layer.isSpecialLayer):
 			delList.append(x)
-		'''
-		 	print ('layer Master: ', layer.name)
-		elif layer.isBraceLayer():
-		 	print ('layer Brace: ', layer.name)
-		elif layer.isSpecialLayer:
-			print ('layer Special: ', layer.name)
-		else:
-			print ('layer.name to delete: ', layer.name)
-			#delList.append(x)
-		'''
 
 	for l in reversed(delList): #need to start with the highest value
 		print ('del layer: %s' %g.layers[l])
